@@ -8,6 +8,7 @@ end
 ruby '2.4.3'
 
 gem 'coffee-rails', '~> 4.2'
+gem 'figaro'
 gem 'httparty'
 gem 'jbuilder', '~> 2.5'
 gem 'puma', '~> 3.7'
