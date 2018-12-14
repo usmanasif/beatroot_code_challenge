@@ -1,34 +1,48 @@
-<h1>Releases</h1>
+<div class="contianer">
+  <div class="row my-5">
+    <div class="col text-center">
+      <h1>Releases</h1>
+    </div>
+  </div>
 
-<div>
-  <table>
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>Artists</th>
-        <th>Release Date</th>
-        <th>Genre</th>
-        <th>Tracks</th>
-        <th></th>
-      </tr>
-    </thead>
+  <div class="row px-5">
+    <div class="col">
+      <table class="table table-bordered table-hover table-sm">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Artists</th>
+            <th>Release Date</th>
+            <th>Genre</th>
+            <th>Tracks</th>
+            <th></th>
+          </tr>
+        </thead>
 
-    <tbody>
-    <% @releases.each do |release| %>
-      <tr>
-        <td><%= release['title'] %></td>
-        <td><%= release['artist']['name'] %></td>
-        <td><%= DateTime.parse(release['release_date']).strftime('%-d %B %Y') %></td>
-        <td><%= release['tag'] && release['tag']['name'] || 'Other' %></td>
-        <td>
-          <ul>
-            <% release['tracks'].each do |track| %>
-              <li><%= "#{track['title']} by #{track['artist']['name']}" %> </li>
-            <% end %>
-          </ul>
-        </td>
-        <td>Download!</td>
-    <% end %>
-    </tbody>
-  </table>
+        <tbody>
+        <% @releases.each do |release| %>
+          <tr>
+            <td><%= release['title'] %></td>
+            <td><%= release['artist']['name'] %></td>
+            <td><%= DateTime.parse(release['release_date']).strftime('%-d %B %Y') %></td>
+            <td><%= release['tag'] && release['tag']['name'] || 'Other' %></td>
+            <td>
+              <ul class="list-unstyled pl-2">
+                <% release['tracks'].each do |track| %>
+                  <li>
+                    <i class="fas fa-xs fa-chevron-right"></i>
+                    <%= "#{track['title']} by #{track['artist']['name']}" %>
+                  </li>
+                <% end %>
+              </ul>
+            </td>
+            <td>
+              <i class="fas fa-download"></i>
+            </td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
