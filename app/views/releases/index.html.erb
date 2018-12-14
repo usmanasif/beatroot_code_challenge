@@ -1,1 +1,34 @@
 <h1>Releases</h1>
+
+<div>
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Artists</th>
+        <th>Release Date</th>
+        <th>Genre</th>
+        <th>Tracks</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+    <% @releases.each do |release| %>
+      <tr>
+        <td><%= release['title'] %></td>
+        <td><%= release['artist']['name'] %></td>
+        <td><%= DateTime.parse(release['release_date']).strftime('%-d %B %Y') %></td>
+        <td><%= release['tag'] && release['tag']['name'] || 'Other' %></td>
+        <td>
+          <ul>
+            <% release['tracks'].each do |track| %>
+              <li><%= "#{track['title']} by #{track['artist']['name']}" %> </li>
+            <% end %>
+          </ul>
+        </td>
+        <td>Download!</td>
+    <% end %>
+    </tbody>
+  </table>
+</div>
