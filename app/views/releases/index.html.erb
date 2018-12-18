@@ -37,7 +37,9 @@
               </ul>
             </td>
             <td>
-              <i class="fas fa-download"></i>
+              <%= link_to download_release_path release['id'] do %>
+                <i class="fas fa-download"></i>
+              <% end %>
             </td>
           </tr>
         <% end %>
