@@ -30,7 +30,7 @@ class ReleasesController < ApplicationController
       tracks << track_response['track']
     end
 
-    builder = Nokogiri::XML::Builder.new do |xml|
+    resource_list_xml = Nokogiri::XML::Builder.new do |xml|
       xml.ResourceList {
         tracks.each do |track|
           xml.Track {
@@ -41,20 +41,20 @@ class ReleasesController < ApplicationController
               xml.SubTitle track['subtitle']
             }
             xml.Duration track['duration']
-            xml.ArtistName track['artist']['name']
-            xml.LabelName track['record_labels'][0]['name']
+            xml.ArtistName track.dig('artist', 'name')
+            xml.LabelName track.dig('record_labels', 0, 'name')
             xml.PLine {
-              xml.Year track['record_labels'][0]['p_line'][0..3]
-              xml.PLineText track['record_labels'][0]['p_line']
+              xml.Year track.dig('record_labels', 0, 'p_line')&.[](0..3)
+              xml.PLineText track.dig('record_labels', 0, 'p_line')
             }
-            xml.Genre track['tag']['name'] if track['tag']['classification'] == 'genre'
-            xml.ParentalWarningType track['parental_warning'].camelize
+            xml.Genre track.dig('tag', 'name') if track.dig('tag', 'classification') == 'genre'
+            xml.ParentalWarningType track['parental_warning']&.camelize
           }
         end
       }
     end
 
-    builder2 = Nokogiri::XML::Builder.new do |xml|
+    release_xml = Nokogiri::XML::Builder.new do |xml|
       xml.Release {
         xml.ReleaseId {
           xml.GRid release['grid']
@@ -71,7 +71,7 @@ class ReleasesController < ApplicationController
           end
         }
         xml.ProductType release['product_type']
-        xml.ArtistName release['artist']['name']
+        xml.ArtistName release.dig('artist', 'name')
         xml.ParentalWarningType release['parental_warning']
         xml.ResourceGroup {
           release['tracks'].each do |track|
@@ -82,15 +82,29 @@ class ReleasesController < ApplicationController
           end
         }
         release['tags'].each do |tag|
-          xml.Genre tag['name'] if classification['genre']
+          xml.Genre tag['name'] if tag['classification'] == 'genre'
         end
         xml.OriginalReleaseDate release['release_date']
+        xml.Duration release['duration']
+        xml.PLine {
+          xml.Year release.dig('record_labels', 0, 'p_line')&.[](0..3)
+          xml.PLineText release.dig('record_labels', 0, 'p_line')
+        }
+        xml.CLine {
+          xml.Year release.dig('record_labels', 0, 'c_line')&.[](0..3)
+          xml.CLineText release.dig('record_labels', 0, 'c_line')
+        }
       }
     end
 
-    puts builder.to_xml(:save_with => Nokogiri::XML::Node::SaveOptions::NO_EMPTY_TAGS)
+    response = resource_list_xml.to_xml.to_s << release_xml.doc.children.to_xml.to_s
 
-    response = builder.to_xml.to_s << builder2.to_xml.to_s
-    render xml: response
+    begin
+      xml_file = Tempfile.new(release['title'])
+      xml_file.write(response)
+      send_file xml_file
+    ensure
+      xml_file.close
+    end
   end
 end
