@@ -4,4 +4,6 @@ Rails.application.routes.draw do
       get :download
     end
   end
+
+  root 'releases#index'
 end
