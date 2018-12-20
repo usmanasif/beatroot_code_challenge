@@ -4,7 +4,6 @@ class ReleasesController < ApplicationController
   end
 
   def download
-    byebug
     response_file = XMLBuilder::ReleaseXML.generate_response_xml_file(params[:id])
 
     return render_errors if response_file.blank?
